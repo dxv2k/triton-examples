@@ -1,0 +1,47 @@
+version: '3.8'
+
+networks:
+  example_triton_server_service_network:
+    driver: bridge
+    external:
+      True
+ 
+services:
+  example_triton_server_service:
+    build: ./triton_service
+    container_name: example_triton_server_service
+    restart: always
+    # runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+    ports:
+      - ${TRITON_GRPC_PORT:-8012}:${TRITON_GRPC_PORT:-8012}
+      - ${TRITON_HTTP_PORT:-8013}:${TRITON_HTTP_PORT:-8013}
+      - ${TRITON_METRICS_PORT:-8018}:${TRITON_METRICS_PORT:-8018}
+    shm_size: '1gb' # NOTE: increase this if model too large 
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      stack:
+        soft: 67108864
+        hard: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    volumes:
+      - "$HOME/.cache/huggingface/:/root/.cache/huggingface/"
+      - "./triton_service:/work"
+
+    # NOTE: using for debug  
+    # command: tail -f /dev/null
+    
+    # NOTE: load all models right away 
+    command: >
+      tritonserver
+      --model-store ./model_workspace/
+      --grpc-port ${TRITON_GRPC_PORT:-8012}
+      --http-port ${TRITON_HTTP_PORT:-8013}
+      --metrics-port ${TRITON_METRICS_PORT:-8014}

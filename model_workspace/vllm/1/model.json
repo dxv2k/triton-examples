@@ -1,0 +1,8 @@
+{
+    "model":"TheBloke/Mistral-7B-v0.1-GPTQ",
+    "disable_log_requests": "true",
+    "gpu_memory_utilization": 0.95,
+    "dtype": "half", 
+    "max_model_len": 4000, 
+    "enforce_eager": "true" 
+}

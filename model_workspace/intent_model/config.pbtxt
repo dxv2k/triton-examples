@@ -1,0 +1,55 @@
+name: "intent_model"
+platform: "onnxruntime_onnx"
+max_batch_size: 4
+input [
+  {
+    name: "input_ids"
+    data_type: TYPE_INT64  # Match the data type
+    dims: [512]  # Assumes the maximum sequence length is 512
+  },
+  {
+    name: "attention_mask"
+    data_type: TYPE_INT64  # Match the data type
+    dims: [512]  # Assumes the maximum sequence length is 512
+  }
+]
+output [
+  {
+    name: "logits"
+    data_type: TYPE_FP32  # Match the data type from the outputs
+    dims: [3]  
+  }
+]
+
+
+instance_group [
+  {
+    kind: KIND_GPU
+    count: 1 # NOTE: Single instance is faster, no idea why 
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [ 2, 4 ]
+  max_queue_delay_microseconds: 10
+}
+
+
+# Specify the use of TensorRT as the preferred execution accelerator
+optimization {
+  execution_accelerators {
+    gpu_execution_accelerator: [
+      {
+        name: "tensorrt"
+        parameters {
+          key: "precision_mode"
+          value: "FP16"  # Can be FP32 or FP16 depending on your preference and hardware capability
+        }
+        parameters {
+          key: "max_workspace_size_bytes"
+          value: "1073741824"  # 1GB workspace size
+        }
+      }
+    ]
+  }
+}

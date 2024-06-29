@@ -1,0 +1,1 @@
+docker-compose down --remove-orphans; docker-compose --env-file ./.env up -d; sleep 15;
