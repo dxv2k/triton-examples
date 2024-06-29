@@ -8,7 +8,7 @@ networks:
  
 services:
   example_triton_server_service:
-    build: ./triton_service
+    build: .
     container_name: example_triton_server_service
     restart: always
     # runtime: nvidia
