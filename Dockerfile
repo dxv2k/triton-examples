@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tritonserver:24.03-python-py3
+FROM nvcr.io/nvidia/tritonserver:24.05-python-py3
 
 # Install dependencies
 RUN apt-get update && \
